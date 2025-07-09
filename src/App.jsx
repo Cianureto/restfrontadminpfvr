@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard'
 import Pedidos from './components/Pedidos'
 import Produtos from './components/Produtos'
 import Clientes from './components/Clientes'
+import Bairros from './components/Bairros'
 import Layout from './components/Layout'
 
 function App() {
@@ -79,6 +80,14 @@ function App() {
           element={
             isAuthenticated ? 
             <Layout><Clientes /></Layout> : 
+            <Navigate to="/login" replace />
+          } 
+        />
+        <Route 
+          path="/bairros" 
+          element={
+            isAuthenticated ? 
+            <Layout><Bairros /></Layout> : 
             <Navigate to="/login" replace />
           } 
         />

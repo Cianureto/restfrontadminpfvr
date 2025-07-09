@@ -23,41 +23,42 @@ function Layout({ children }) {
     { path: '/dashboard', icon: 'fa-chart-line', label: 'Dashboard' },
     { path: '/pedidos', icon: 'fa-receipt', label: 'Pedidos' },
     { path: '/produtos', icon: 'fa-utensils', label: 'Produtos' },
-    { path: '/clientes', icon: 'fa-users', label: 'Clientes' }
+    { path: '/clientes', icon: 'fa-users', label: 'Clientes' },
+    { path: '/bairros', icon: 'fa-map-marker-alt', label: 'Bairros' },
   ]
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col justify-between">
+      <aside className="w-64 bg-gradient-to-b from-indigo-100 via-white to-indigo-50 shadow-xl rounded-r-3xl flex flex-col justify-between transition-all duration-300">
         <div>
-          <div className="flex items-center gap-2 px-6 py-6 border-b">
-            <i className="fa-solid fa-bowl-food text-2xl text-indigo-600"></i>
-            <span className="font-bold text-lg text-gray-800">Painel Delivery</span>
+          <div className="flex items-center gap-3 px-7 py-7 border-b border-indigo-100">
+            <i className="fa-solid fa-bowl-food text-3xl text-indigo-600 drop-shadow"></i>
+            <span className="font-extrabold text-xl text-indigo-700 tracking-wide">Painel Delivery</span>
           </div>
           
-          <nav className="mt-6 flex flex-col gap-1 px-2">
+          <nav className="mt-8 flex flex-col gap-2 px-3">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors ${
-                  isActive(item.path)
-                    ? 'bg-indigo-50 text-indigo-700 font-medium'
-                    : 'text-gray-700 hover:bg-indigo-50'
-                }`}
+                className={`flex items-center gap-4 px-5 py-3 rounded-xl text-left transition-all duration-200 text-base shadow-sm
+                  ${isActive(item.path)
+                    ? 'bg-indigo-200/80 text-indigo-900 font-bold shadow-md scale-[1.03]'
+                    : 'text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'}
+                `}
               >
-                <i className={`fa-solid ${item.icon}`}></i>
+                <i className={`fa-solid ${item.icon} text-lg`}></i>
                 {item.label}
               </button>
             ))}
           </nav>
         </div>
         
-        <div className="px-6 py-4 border-t">
+        <div className="px-7 py-5 border-t border-indigo-100">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-red-600 hover:text-red-800 font-semibold transition-colors"
+            className="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 hover:text-white hover:bg-red-500/90 font-semibold transition-all duration-200 shadow-sm"
           >
             <i className="fa-solid fa-arrow-right-from-bracket"></i>
             Sair
@@ -66,7 +67,7 @@ function Layout({ children }) {
       </aside>
       
       {/* Conteúdo */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-8">
         {children}
       </main>
     </div>

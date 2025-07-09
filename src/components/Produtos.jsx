@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { produtosService } from '../services/produtosService.js'
 import { getImageUrl } from '../utils/imageUtils.js'
 import ImageWithFallback from './ImageWithFallback.jsx'
+import { categoriasService } from '../services/categoriasService.js'
 
 function Produtos() {
   const [produtos, setProdutos] = useState([])
@@ -14,10 +15,22 @@ function Produtos() {
     descricao: '',
     preco: '',
     categoria: '',
-    disponivel: true
+    disponivel: true // sempre booleano
   })
   const [selectedImage, setSelectedImage] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [showCategoriasModal, setShowCategoriasModal] = useState(false);
+
+  const [categorias, setCategorias] = useState([
+    { id: 1, nome: 'Lanches' },
+    { id: 2, nome: 'Pizzas' },
+    { id: 3, nome: 'Acompanhamentos' },
+    { id: 4, nome: 'Bebidas' },
+    { id: 5, nome: 'Sobremesas' },
+  ])
+  const [novaCategoria, setNovaCategoria] = useState('')
+  const [editandoCategoria, setEditandoCategoria] = useState(null)
+  const [nomeEditando, setNomeEditando] = useState('')
 
   useEffect(() => {
     loadProdutos()
@@ -77,7 +90,7 @@ function Produtos() {
       descricao: produto.descricao,
       preco: produto.preco.toString(),
       categoria: produto.categoria,
-      disponivel: produto.disponivel
+      disponivel: !!produto.disponivel // força booleano
     })
     setShowModal(true)
   }
@@ -98,13 +111,14 @@ function Produtos() {
     try {
       const produto = produtos.find(p => p.id === produtoId)
       const newDisponivel = !produto.disponivel
-      
-      await produtosService.updateProdutoDisponibilidade(produtoId, newDisponivel)
-      
-      setProdutos(produtos.map(produto => 
-        produto.id === produtoId 
-          ? { ...produto, disponivel: newDisponivel }
-          : produto
+      // Atualiza no backend
+      const response = await produtosService.updateProdutoDisponibilidade(produtoId, newDisponivel)
+      // Se a resposta da API retorna o produto atualizado, use ela:
+      const produtoAtualizado = response && response.data ? response.data : { ...produto, disponivel: newDisponivel }
+      setProdutos(produtos.map(p => 
+        p.id === produtoId 
+          ? { ...p, ...produtoAtualizado }
+          : p
       ))
     } catch (error) {
       console.error('Erro ao atualizar disponibilidade:', error)
@@ -130,7 +144,7 @@ function Produtos() {
     const { name, value, type, checked } = e.target
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? !!checked : value // força booleano
     })
   }
 
@@ -148,6 +162,44 @@ function Produtos() {
       setImagePreview(null);
     }
   };
+
+  // Substituir o mock de categorias por busca real da API
+  useEffect(() => {
+    if (showCategoriasModal) {
+      loadCategorias()
+    }
+  }, [showCategoriasModal])
+
+  const loadCategorias = async () => {
+    try {
+      const resp = await categoriasService.getCategorias()
+      setCategorias(resp.data || resp || [])
+    } catch (e) {
+      setCategorias([])
+    }
+  }
+
+  const handleAddCategoria = async () => {
+    if (novaCategoria.trim() && !categorias.some(c => c.nome.toLowerCase() === novaCategoria.trim().toLowerCase())) {
+      await categoriasService.createCategoria(novaCategoria.trim())
+      setNovaCategoria('')
+      loadCategorias()
+    }
+  }
+  const handleEditCategoria = (cat) => {
+    setEditandoCategoria(cat.id)
+    setNomeEditando(cat.nome)
+  }
+  const handleSaveEditCategoria = async () => {
+    await categoriasService.updateCategoria(editandoCategoria, nomeEditando)
+    setEditandoCategoria(null)
+    setNomeEditando('')
+    loadCategorias()
+  }
+  const handleDeleteCategoria = async (id) => {
+    await categoriasService.deleteCategoria(id)
+    loadCategorias()
+  }
 
   if (loading) {
     return (
@@ -283,23 +335,28 @@ function Produtos() {
                 />
               </div>
               
-              <div>
-                <label className="block text-gray-700 font-medium mb-1">Categoria</label>
-                <select
-                  name="categoria"
-                  value={formData.categoria}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+              <div className="flex items-center gap-2 mb-1">
+                <label className="block text-gray-700 font-medium">Categoria</label>
+                <button
+                  type="button"
+                  className="text-xs text-indigo-600 hover:underline focus:outline-none"
+                  onClick={() => setShowCategoriasModal(true)}
                 >
-                  <option value="">Selecione uma categoria</option>
-                  <option value="Lanches">Lanches</option>
-                  <option value="Pizzas">Pizzas</option>
-                  <option value="Acompanhamentos">Acompanhamentos</option>
-                  <option value="Bebidas">Bebidas</option>
-                  <option value="Sobremesas">Sobremesas</option>
-                </select>
+                  Gerenciar Categorias
+                </button>
               </div>
+              <select
+                name="categoria"
+                value={formData.categoria}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+              >
+                <option value="">Selecione uma categoria</option>
+                {categorias.map(cat => (
+                  <option key={cat.id} value={cat.nome}>{cat.nome}</option>
+                ))}
+              </select>
               
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Imagem</label>
@@ -350,6 +407,54 @@ function Produtos() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Gerenciar Categorias */}
+      {showCategoriasModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setShowCategoriasModal(false)}>
+              <i className="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 className="text-lg font-semibold mb-4">Gerenciar Categorias</h3>
+            <div className="space-y-2 mb-4">
+              {categorias.map(cat => (
+                <div key={cat.id} className="flex items-center gap-2">
+                  {editandoCategoria === cat.id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={nomeEditando}
+                        onChange={e => setNomeEditando(e.target.value)}
+                        className="flex-1 px-2 py-1 border rounded"
+                      />
+                      <button className="text-green-600" onClick={handleSaveEditCategoria}><i className="fa-solid fa-check"></i></button>
+                      <button className="text-gray-500" onClick={() => setEditandoCategoria(null)}><i className="fa-solid fa-xmark"></i></button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex-1">{cat.nome}</span>
+                      <button className="text-blue-600" onClick={() => handleEditCategoria(cat)}><i className="fa-solid fa-edit"></i></button>
+                      <button className="text-red-600" onClick={() => handleDeleteCategoria(cat.id)}><i className="fa-solid fa-trash"></i></button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <input
+                type="text"
+                placeholder="Nova categoria"
+                value={novaCategoria}
+                onChange={e => setNovaCategoria(e.target.value)}
+                className="flex-1 px-2 py-1 border rounded"
+              />
+              <button className="bg-indigo-600 text-white px-3 py-1 rounded" onClick={handleAddCategoria}>
+                <i className="fa-solid fa-plus"></i>
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -11,14 +11,37 @@ function Clientes() {
     loadClientes()
   }, [])
 
+  // Função para buscar estatísticas de todos os clientes
+  const fetchStatsForAllClientes = async (clientesList) => {
+    const updatedClientes = await Promise.all(
+      clientesList.map(async (cliente) => {
+        try {
+          const statsResp = await clientesService.getClienteStats(cliente.id)
+          const stats = statsResp.data || statsResp
+          return {
+            ...cliente,
+            valorTotal: stats.totalGasto ?? 0,
+            totalPedidos: stats.totalPedidos ?? 0,
+            ultimoPedido: stats.ultimoPedido?.criado_em ? new Date(stats.ultimoPedido.criado_em).toLocaleDateString('pt-BR') : '',
+          }
+        } catch (e) {
+          return { ...cliente, valorTotal: 0, totalPedidos: 0 }
+        }
+      })
+    )
+    setClientes(updatedClientes)
+  }
+
   const loadClientes = async () => {
     try {
       setLoading(true)
       setError('')
 
       const response = await clientesService.getClientes()
-      const clientes = response.data || response || []
-      setClientes(clientes)
+      const clientesList = response.data || response || []
+      setClientes(clientesList)
+      // Buscar estatísticas após carregar clientes
+      fetchStatsForAllClientes(clientesList)
     } catch (error) {
       console.error('Erro ao carregar clientes:', error)
       setError('Erro ao carregar clientes')
@@ -104,7 +127,7 @@ function Clientes() {
             <div>
               <p className="text-gray-500 text-sm">Total de Pedidos</p>
               <p className="text-2xl font-bold text-gray-800">
-                {clientes.reduce((sum, cliente) => sum + cliente.totalPedidos, 0)}
+                {clientes.reduce((sum, cliente) => sum + (cliente.totalPedidos ?? 0), 0)}
               </p>
             </div>
             <div className="bg-purple-500 p-3 rounded-lg">
@@ -118,7 +141,7 @@ function Clientes() {
             <div>
               <p className="text-gray-500 text-sm">Receita Total</p>
               <p className="text-2xl font-bold text-gray-800">
-                R$ {clientes.reduce((sum, cliente) => sum + cliente.valorTotal, 0).toFixed(2)}
+                R$ {(clientes.reduce((sum, cliente) => sum + (cliente.valorTotal ?? 0), 0)).toFixed(2)}
               </p>
             </div>
             <div className="bg-orange-500 p-3 rounded-lg">
@@ -175,11 +198,11 @@ function Clientes() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{cliente.totalPedidos}</div>
+                    <div className="text-sm text-gray-900">{cliente.totalPedidos ?? 0}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-green-600">
-                      R$ {cliente.valorTotal.toFixed(2)}
+                      R$ {(cliente.valorTotal ?? 0).toFixed(2)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

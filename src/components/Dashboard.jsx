@@ -128,7 +128,7 @@ function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">{card.title}</p>
-                <p className="text-2xl font-bold text-gray-800">{card.value}</p>
+                <p className="text-2xl font-bold text-gray-800">{typeof card.value === 'object' ? JSON.stringify(card.value) : card.value}</p>
               </div>
               <div className={`${card.color} p-3 rounded-lg`}>
                 <i className={`fa-solid ${card.icon} text-white text-xl`}></i>
@@ -182,10 +182,10 @@ function Dashboard() {
             {dashboardData.topProdutos.map((produto, index) => (
               <li key={index} className="py-2 flex justify-between items-center">
                 <div>
-                  <p className="font-medium">{produto.nome}</p>
-                  <p className="text-sm text-gray-500">{produto.vendas} vendas</p>
+                  <p className="font-medium">{typeof produto.nome === 'object' ? JSON.stringify(produto.nome) : produto.nome}</p>
+                  <p className="text-sm text-gray-500">{typeof produto.quantidade === 'object' ? JSON.stringify(produto.quantidade) : produto.quantidade} vendas</p>
                 </div>
-                <span className="font-semibold text-green-600">{produto.valor}</span>
+                <span className="font-semibold text-green-600">{typeof produto.valor === 'object' ? JSON.stringify(produto.valor) : produto.valor}</span>
               </li>
             ))}
           </ul>
@@ -198,24 +198,39 @@ function Dashboard() {
             Pedidos Recentes
           </h4>
           <ul className="divide-y">
-            {dashboardData.pedidosRecentes.map((pedido, index) => (
-              <li key={index} className="py-2 flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{pedido.id}</p>
-                  <p className="text-sm text-gray-500">{pedido.cliente}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">{pedido.valor}</p>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    pedido.status === 'Entregue' ? 'bg-green-100 text-green-800' :
-                    pedido.status === 'Em preparo' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {pedido.status}
-                  </span>
-                </div>
-              </li>
-            ))}
+            {dashboardData.pedidosRecentes.map((pedido, index) => {
+              // Extrai nome do cliente corretamente
+              let nomeCliente = pedido.cliente;
+              if (typeof nomeCliente === 'object' && nomeCliente !== null) {
+                nomeCliente = nomeCliente.nome || Object.values(nomeCliente)[0] || 'Cliente';
+              }
+              if (typeof nomeCliente !== 'string') nomeCliente = String(nomeCliente);
+              return (
+                <li key={index} className="py-3 flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="font-bold text-indigo-700 text-base">#{pedido.id}</span>
+                    <span className="text-gray-800 font-medium text-sm">{nomeCliente}</span>
+                    {pedido.total && (
+                      <span className="text-xs text-gray-500">Total: R$ {Number(pedido.total).toFixed(2)}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1
+                      ${pedido.status?.toLowerCase() === 'entregue' ? 'bg-green-100 text-green-800' :
+                        pedido.status?.toLowerCase() === 'pronto' ? 'bg-blue-100 text-blue-800' :
+                        pedido.status?.toLowerCase() === 'em preparo' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'}
+                    `}>
+                      {pedido.status?.toLowerCase() === 'entregue' && <i className="fa-solid fa-check-circle"></i>}
+                      {pedido.status?.toLowerCase() === 'pronto' && <i className="fa-solid fa-bell"></i>}
+                      {pedido.status?.toLowerCase() === 'em preparo' && <i className="fa-solid fa-utensils"></i>}
+                      {pedido.status?.toLowerCase() === 'pendente' && <i className="fa-solid fa-clock"></i>}
+                      {pedido.status}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
