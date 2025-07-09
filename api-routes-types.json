@@ -1,0 +1,1078 @@
+{
+  "dashboard": {
+    "routes": {
+      "GET /api/dashboard": {
+        "description": "Dados gerais do dashboard",
+        "response": {
+          "success": "boolean",
+          "data": {
+            "estatisticas": {
+              "pedidosHoje": "number",
+              "totalVendasHoje": "number",
+              "ticketMedio": "number",
+              "totalClientes": "number"
+            },
+            "topProdutos": "array",
+            "pedidosRecentes": "array"
+          }
+        }
+      },
+      "GET /api/dashboard/stats": {
+        "description": "Estatísticas gerais do dashboard",
+        "response": {
+          "success": "boolean",
+          "data": {
+            "estatisticas": {
+              "pedidosHoje": "number",
+              "totalVendasHoje": "number",
+              "ticketMedio": "number",
+              "totalClientes": "number"
+            },
+            "topProdutos": "array",
+            "pedidosRecentes": "array"
+          }
+        }
+      },
+      "GET /api/dashboard/grafico": {
+        "description": "Dados para gráficos",
+        "query": {
+          "periodo": "string (7dias|30dias|status|produtos)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "tipo": "string",
+            "dados": "array"
+          }
+        }
+      },
+      "GET /api/dashboard/vendas-chart": {
+        "description": "Gráfico de vendas",
+        "query": {
+          "periodo": "string (7dias|30dias)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "periodo": "string",
+            "dados": [
+              {
+                "data": "string (YYYY-MM-DD)",
+                "vendas": "number"
+              }
+            ]
+          }
+        }
+      },
+      "GET /api/dashboard/top-produtos": {
+        "description": "Top produtos mais vendidos",
+        "query": {
+          "limite": "number (default: 10)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "nome": "string",
+              "categoria": "string",
+              "quantidade_vendida": "number",
+              "total_vendido": "number"
+            }
+          ]
+        }
+      },
+      "GET /api/dashboard/pedidos-recentes": {
+        "description": "Pedidos mais recentes",
+        "query": {
+          "limite": "number (default: 10)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "cliente": {
+                "nome": "string",
+                "telefone": "string"
+              },
+              "total": "number",
+              "status": "string",
+              "dataHora": "string (ISO)",
+              "forma_pagamento": "string"
+            }
+          ]
+        }
+      },
+      "GET /api/dashboard/relatorios": {
+        "description": "Relatórios diversos",
+        "query": {
+          "tipo": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": "object"
+        }
+      }
+    }
+  },
+  "produtos": {
+    "routes": {
+      "GET /api/produtos": {
+        "description": "Listar todos os produtos",
+        "query": {
+          "filters": "object (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "descricao": "string",
+              "categoria": "string",
+              "preco": "number",
+              "imagem": "string|null",
+              "disponivel": "boolean",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "GET /api/produtos/:id": {
+        "description": "Buscar produto por ID",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "descricao": "string",
+            "categoria": "string",
+            "preco": "number",
+            "imagem": "string|null",
+            "disponivel": "boolean",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "POST /api/produtos": {
+        "description": "Criar novo produto",
+        "body": {
+          "nome": "string (required)",
+          "descricao": "string (required)",
+          "categoria": "string (required)",
+          "preco": "number (required)",
+          "imagem": "string (optional)",
+          "disponivel": "boolean (optional, default: true)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "descricao": "string",
+            "categoria": "string",
+            "preco": "number",
+            "imagem": "string|null",
+            "disponivel": "boolean",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "PUT /api/produtos/:id": {
+        "description": "Atualizar produto",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "nome": "string (optional)",
+          "descricao": "string (optional)",
+          "categoria": "string (optional)",
+          "preco": "number (optional)",
+          "imagem": "string (optional)",
+          "disponivel": "boolean (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "descricao": "string",
+            "categoria": "string",
+            "preco": "number",
+            "imagem": "string|null",
+            "disponivel": "boolean",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "DELETE /api/produtos/:id": {
+        "description": "Deletar produto",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      },
+      "PUT /api/produtos/:id/disponibilidade": {
+        "description": "Atualizar disponibilidade do produto",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "disponivel": "boolean (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "descricao": "string",
+            "categoria": "string",
+            "preco": "number",
+            "imagem": "string|null",
+            "disponivel": "boolean",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "GET /api/produtos/categoria/:categoria": {
+        "description": "Buscar produtos por categoria",
+        "params": {
+          "categoria": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "descricao": "string",
+              "categoria": "string",
+              "preco": "number",
+              "imagem": "string|null",
+              "disponivel": "boolean",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "GET /api/produtos/disponiveis": {
+        "description": "Buscar produtos disponíveis",
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "descricao": "string",
+              "categoria": "string",
+              "preco": "number",
+              "imagem": "string|null",
+              "disponivel": "boolean",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "POST /api/produtos/:id/imagem": {
+        "description": "Upload de imagem do produto",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "imagem": "file (FormData)"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      },
+      "GET /api/produtos/categorias": {
+        "description": "Listar categorias disponíveis",
+        "response": {
+          "success": "boolean",
+          "data": [
+            "string"
+          ]
+        }
+      }
+    }
+  },
+  "pedidos": {
+    "routes": {
+      "GET /api/pedidos": {
+        "description": "Listar todos os pedidos",
+        "query": {
+          "status": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "cliente_id": "string",
+              "cliente_nome": "string",
+              "cliente_telefone": "string",
+              "total": "number",
+              "taxa_entrega": "number",
+              "status": "string",
+              "forma_pagamento": "string",
+              "observacoes": "string|null",
+              "endereco_entrega": "string",
+              "criado_em": "string (ISO)",
+              "itens": [
+                {
+                  "id": "string",
+                  "nome": "string",
+                  "quantidade": "number",
+                  "precoUnitario": "number",
+                  "subtotal": "number",
+                  "observacoes": "string|null"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "GET /api/pedidos/:id": {
+        "description": "Buscar pedido por ID",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "cliente_id": "string",
+            "cliente_nome": "string",
+            "cliente_telefone": "string",
+            "total": "number",
+            "taxa_entrega": "number",
+            "status": "string",
+            "forma_pagamento": "string",
+            "observacoes": "string|null",
+            "endereco_entrega": "string",
+            "criado_em": "string (ISO)",
+            "itens": [
+              {
+                "id": "string",
+                "nome": "string",
+                "quantidade": "number",
+                "precoUnitario": "number",
+                "subtotal": "number",
+                "observacoes": "string|null"
+              }
+            ]
+          }
+        }
+      },
+      "POST /api/pedidos": {
+        "description": "Criar novo pedido",
+        "body": {
+          "cliente_id": "string (required)",
+          "total": "number (required)",
+          "taxa_entrega": "number (optional)",
+          "observacoes": "string (optional)",
+          "endereco_entrega": "string (optional)",
+          "forma_pagamento": "string (optional)",
+          "itens": "array (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "cliente_id": "string",
+            "total": "number",
+            "taxa_entrega": "number",
+            "status": "string",
+            "forma_pagamento": "string",
+            "observacoes": "string|null",
+            "endereco_entrega": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "PUT /api/pedidos/:id": {
+        "description": "Atualizar pedido",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "cliente_id": "string (optional)",
+          "total": "number (optional)",
+          "taxa_entrega": "number (optional)",
+          "observacoes": "string (optional)",
+          "endereco_entrega": "string (optional)",
+          "forma_pagamento": "string (optional)",
+          "itens": "array (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "cliente_id": "string",
+            "cliente_nome": "string",
+            "cliente_telefone": "string",
+            "total": "number",
+            "taxa_entrega": "number",
+            "status": "string",
+            "forma_pagamento": "string",
+            "observacoes": "string|null",
+            "endereco_entrega": "string",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "PATCH /api/pedidos/:id/status": {
+        "description": "Atualizar status do pedido",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "status": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "cliente_id": "string",
+            "cliente_nome": "string",
+            "cliente_telefone": "string",
+            "total": "number",
+            "taxa_entrega": "number",
+            "status": "string",
+            "forma_pagamento": "string",
+            "observacoes": "string|null",
+            "endereco_entrega": "string",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "GET /api/pedidos/status/:status": {
+        "description": "Buscar pedidos por status",
+        "params": {
+          "status": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "cliente_id": "string",
+              "cliente_nome": "string",
+              "cliente_telefone": "string",
+              "total": "number",
+              "taxa_entrega": "number",
+              "status": "string",
+              "forma_pagamento": "string",
+              "observacoes": "string|null",
+              "endereco_entrega": "string",
+              "criado_em": "string (ISO)",
+              "itens": [
+                {
+                  "id": "string",
+                  "nome": "string",
+                  "quantidade": "number",
+                  "precoUnitario": "number",
+                  "subtotal": "number",
+                  "observacoes": "string|null"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "GET /api/pedidos/date/:data": {
+        "description": "Buscar pedidos por data",
+        "params": {
+          "data": "string (YYYY-MM-DD)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "cliente_id": "string",
+              "cliente_nome": "string",
+              "cliente_telefone": "string",
+              "total": "number",
+              "taxa_entrega": "number",
+              "status": "string",
+              "forma_pagamento": "string",
+              "observacoes": "string|null",
+              "endereco_entrega": "string",
+              "criado_em": "string (ISO)",
+              "itens": [
+                {
+                  "id": "string",
+                  "nome": "string",
+                  "quantidade": "number",
+                  "precoUnitario": "number",
+                  "subtotal": "number",
+                  "observacoes": "string|null"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "DELETE /api/pedidos/:id": {
+        "description": "Cancelar pedido",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      }
+    }
+  },
+  "clientes": {
+    "routes": {
+      "GET /api/clientes": {
+        "description": "Listar todos os clientes",
+        "query": {
+          "telefone": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "GET /api/clientes/:id": {
+        "description": "Buscar cliente por ID",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "POST /api/clientes": {
+        "description": "Criar novo cliente",
+        "body": {
+          "nome": "string (required)",
+          "telefone": "string (required)",
+          "email": "string (optional)",
+          "endereco": "string (optional)",
+          "bairro": "string (optional)",
+          "cidade": "string (optional)",
+          "estado": "string (optional)",
+          "cep": "string (optional)",
+          "observacoes": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "PUT /api/clientes/:id": {
+        "description": "Atualizar cliente",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "nome": "string (optional)",
+          "telefone": "string (optional)",
+          "email": "string (optional)",
+          "endereco": "string (optional)",
+          "bairro": "string (optional)",
+          "cidade": "string (optional)",
+          "estado": "string (optional)",
+          "cep": "string (optional)",
+          "observacoes": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "DELETE /api/clientes/:id": {
+        "description": "Deletar cliente",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      },
+      "GET /api/clientes/email/:email": {
+        "description": "Buscar cliente por email",
+        "params": {
+          "email": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "GET /api/clientes/telefone/:telefone": {
+        "description": "Buscar cliente por telefone",
+        "params": {
+          "telefone": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "GET /api/clientes/:id/pedidos": {
+        "description": "Buscar pedidos de um cliente",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "cliente": {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            },
+            "pedidos": "array",
+            "totalPedidos": "number"
+          }
+        }
+      },
+      "GET /api/clientes/:id/stats": {
+        "description": "Estatísticas do cliente",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "cliente": {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            },
+            "totalPedidos": "number",
+            "totalGasto": "number",
+            "ticketMedio": "number",
+            "ultimoPedido": "object|null"
+          }
+        }
+      },
+      "PUT /api/clientes/:id/status": {
+        "description": "Atualizar status do cliente",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "status": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "nome": "string",
+            "telefone": "string",
+            "email": "string|null",
+            "endereco": "string|null",
+            "bairro": "string|null",
+            "cidade": "string|null",
+            "estado": "string|null",
+            "cep": "string|null",
+            "observacoes": "string|null",
+            "status": "string",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "GET /api/clientes/ativos": {
+        "description": "Buscar clientes ativos",
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "GET /api/clientes/inativos": {
+        "description": "Buscar clientes inativos",
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "GET /api/clientes/search": {
+        "description": "Buscar clientes por nome",
+        "query": {
+          "nome": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "telefone": "string",
+              "email": "string|null",
+              "endereco": "string|null",
+              "bairro": "string|null",
+              "cidade": "string|null",
+              "estado": "string|null",
+              "cep": "string|null",
+              "observacoes": "string|null",
+              "status": "string",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "auth": {
+    "routes": {
+      "POST /api/auth/login": {
+        "description": "Login de administrador",
+        "body": {
+          "email": "string (required)",
+          "senha": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "token": "string",
+            "user": {
+              "id": "string",
+              "email": "string",
+              "nome": "string",
+              "telefone": "string|null",
+              "tipo": "string"
+            }
+          },
+          "message": "string"
+        }
+      },
+      "GET /api/auth/verify": {
+        "description": "Verificar autenticação",
+        "headers": {
+          "Authorization": "Bearer TOKEN"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "user": {
+              "id": "string",
+              "email": "string",
+              "nome": "string",
+              "tipo": "string"
+            }
+          },
+          "message": "string"
+        }
+      },
+      "POST /api/auth/logout": {
+        "description": "Logout",
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      },
+      "POST /api/auth/register": {
+        "description": "Registrar novo admin",
+        "headers": {
+          "Authorization": "Bearer TOKEN"
+        },
+        "body": {
+          "email": "string (required)",
+          "senha": "string (required)",
+          "nome": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "email": "string",
+            "nome": "string",
+            "role": "string"
+          },
+          "message": "string"
+        }
+      },
+      "POST /api/auth/change-password": {
+        "description": "Alterar senha",
+        "headers": {
+          "Authorization": "Bearer TOKEN"
+        },
+        "body": {
+          "senhaAtual": "string (required)",
+          "novaSenha": "string (required)"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      }
+    }
+  },
+  "api": {
+    "routes": {
+      "GET /api/health": {
+        "description": "Health check da API",
+        "response": {
+          "status": "string",
+          "message": "string",
+          "timestamp": "string (ISO)"
+        }
+      },
+      "GET /api/status": {
+        "description": "Status do servidor",
+        "response": {
+          "success": "boolean",
+          "data": {
+            "uptime": "number",
+            "timestamp": "string (ISO)",
+            "environment": "string",
+            "version": "string"
+          }
+        }
+      }
+    }
+  },
+  "painel": {
+    "routes": {
+      "GET /api/painel/info": {
+        "description": "Informações do painel",
+        "response": {
+          "success": "boolean",
+          "data": {
+            "nome": "string",
+            "versao": "string",
+            "ambiente": "string"
+          }
+        }
+      },
+      "GET /api/painel/menu": {
+        "description": "Menu do painel",
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "nome": "string",
+              "icone": "string",
+              "url": "string"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "config": {
+    "routes": {
+      "GET /api/config": {
+        "description": "Listar configurações",
+        "response": {
+          "success": "boolean",
+          "data": [
+            {
+              "id": "string",
+              "chave": "string",
+              "valor": "string",
+              "descricao": "string",
+              "tipo": "string",
+              "criado_em": "string (ISO)"
+            }
+          ]
+        }
+      },
+      "POST /api/config": {
+        "description": "Criar configuração",
+        "body": {
+          "chave": "string (required)",
+          "valor": "string (required)",
+          "descricao": "string (optional)",
+          "tipo": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "chave": "string",
+            "valor": "string",
+            "descricao": "string|null",
+            "tipo": "string",
+            "criado_em": "string (ISO)"
+          }
+        }
+      },
+      "PUT /api/config/:id": {
+        "description": "Atualizar configuração",
+        "params": {
+          "id": "string"
+        },
+        "body": {
+          "chave": "string (optional)",
+          "valor": "string (optional)",
+          "descricao": "string (optional)",
+          "tipo": "string (optional)"
+        },
+        "response": {
+          "success": "boolean",
+          "data": {
+            "id": "string",
+            "chave": "string",
+            "valor": "string",
+            "descricao": "string|null",
+            "tipo": "string",
+            "criado_em": "string (ISO)"
+          },
+          "message": "string"
+        }
+      },
+      "DELETE /api/config/:id": {
+        "description": "Deletar configuração",
+        "params": {
+          "id": "string"
+        },
+        "response": {
+          "success": "boolean",
+          "message": "string"
+        }
+      }
+    }
+  }
+} 

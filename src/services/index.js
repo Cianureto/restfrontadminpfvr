@@ -1,0 +1,8 @@
+export { authService } from './authService.js'
+export { dashboardService } from './dashboardService.js'
+export { pedidosService } from './pedidosService.js'
+export { produtosService } from './produtosService.js'
+export { clientesService } from './clientesService.js'
+export { apiService } from './apiService.js'
+export { painelService } from './painelService.js'
+export { configService } from './configService.js' 
