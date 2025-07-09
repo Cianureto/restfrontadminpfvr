@@ -123,8 +123,8 @@ O projeto está configurado para conectar com uma API REST em `http://localhost:
 #### Produtos
 - `GET /api/produtos` - Listar todos os produtos
 - `GET /api/produtos/:id` - Buscar produto por ID
-- `POST /api/produtos` - Criar novo produto
-- `PUT /api/produtos/:id` - Atualizar produto
+- `POST /api/produtos` - Criar novo produto (multipart/form-data)
+- `PUT /api/produtos/:id` - Atualizar produto (multipart/form-data)
 - `DELETE /api/produtos/:id` - Deletar produto
 - `PUT /api/produtos/:id/disponibilidade` - Atualizar disponibilidade
 - `GET /api/produtos/categoria/:categoria` - Buscar produtos por categoria
@@ -365,8 +365,25 @@ Para alterar a URL da API, edite o arquivo `src/config/api.js`:
 ```javascript
 export const API_CONFIG = {
   BASE_URL: 'http://localhost:3000/api', // Altere aqui
+  BASE_URL_IMAGES: 'http://localhost:3000', // URL para imagens
   // ...
 }
+```
+
+### 🖼️ Configuração de Imagens
+
+O sistema inclui tratamento automático para URLs de imagem:
+
+- **Utilitário de Imagens**: `src/utils/imageUtils.js`
+- **Componente com Fallback**: `src/components/ImageWithFallback.jsx`
+- **Tratamento de CORS**: URLs são construídas automaticamente
+
+```javascript
+import { getImageUrl } from '../utils/imageUtils.js'
+
+// URL será construída automaticamente
+const imageUrl = getImageUrl('/uploads/produtos/imagem.png')
+// Resultado: http://localhost:3000/uploads/produtos/imagem.png
 ```
 
 ## 📝 Tipos TypeScript
@@ -455,7 +472,27 @@ const updatePedidoStatus = async (pedidoId, newStatus) => {
   }
 }
 
-// Upload de imagem de produto
+// Criar produto com imagem
+const createProdutoComImagem = async (produtoData, imageFile) => {
+  try {
+    const response = await produtosService.createProduto(produtoData, imageFile)
+    console.log('Produto criado com sucesso:', response.data)
+  } catch (error) {
+    console.error('Erro ao criar produto:', error)
+  }
+}
+
+// Atualizar produto com imagem
+const updateProdutoComImagem = async (produtoId, produtoData, imageFile) => {
+  try {
+    const response = await produtosService.updateProduto(produtoId, produtoData, imageFile)
+    console.log('Produto atualizado com sucesso:', response.data)
+  } catch (error) {
+    console.error('Erro ao atualizar produto:', error)
+  }
+}
+
+// Upload de imagem separado (método antigo)
 const uploadProdutoImagem = async (produtoId, imageFile) => {
   try {
     await produtosService.uploadProdutoImagem(produtoId, imageFile)

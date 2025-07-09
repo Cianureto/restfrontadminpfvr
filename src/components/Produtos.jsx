@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { produtosService } from '../services/produtosService.js'
+import { getImageUrl } from '../utils/imageUtils.js'
+import ImageWithFallback from './ImageWithFallback.jsx'
 
 function Produtos() {
   const [produtos, setProdutos] = useState([])
@@ -14,6 +16,8 @@ function Produtos() {
     categoria: '',
     disponivel: true
   })
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
   useEffect(() => {
     loadProdutos()
@@ -36,36 +40,33 @@ function Produtos() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
+      const produtoData = {
+        ...formData,
+        preco: parseFloat(formData.preco)
+      };
+
       if (editingProduto) {
         // Editar produto existente
-        await produtosService.updateProduto(editingProduto.id, {
-          ...formData,
-          preco: parseFloat(formData.preco)
-        })
-        
+        const response = await produtosService.updateProduto(editingProduto.id, produtoData, selectedImage);
         // Atualizar estado local
-        setProdutos(produtos.map(produto => 
-          produto.id === editingProduto.id 
-            ? { ...produto, ...formData, preco: parseFloat(formData.preco) }
+        setProdutos(produtos.map(produto =>
+          produto.id === editingProduto.id
+            ? { ...produto, ...produtoData, preco: parseFloat(formData.preco), imagem: response.data.imagem }
             : produto
-        ))
+        ));
       } else {
         // Adicionar novo produto
-        const newProduto = await produtosService.createProduto({
-          ...formData,
-          preco: parseFloat(formData.preco)
-        })
-        
-        setProdutos([...produtos, newProduto])
+        const response = await produtosService.createProduto(produtoData, selectedImage);
+        setProdutos([...produtos, response.data]);
       }
 
-      resetForm()
+      resetForm();
     } catch (error) {
-      console.error('Erro ao salvar produto:', error)
-      alert('Erro ao salvar produto')
+      console.error('Erro ao salvar produto:', error);
+      alert('Erro ao salvar produto');
     }
   }
 
@@ -121,6 +122,8 @@ function Produtos() {
     })
     setEditingProduto(null)
     setShowModal(false)
+    setSelectedImage(null)
+    setImagePreview(null)
   }
 
   const handleChange = (e) => {
@@ -130,6 +133,21 @@ function Produtos() {
       [name]: type === 'checkbox' ? checked : value
     })
   }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(file);
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSelectedImage(null);
+      setImagePreview(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -162,7 +180,7 @@ function Produtos() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {produtos.map((produto) => (
           <div key={produto.id} className="bg-white rounded-xl shadow overflow-hidden">
-            <img 
+            <ImageWithFallback 
               src={produto.imagem} 
               alt={produto.nome}
               className="w-full h-48 object-cover"
@@ -281,6 +299,28 @@ function Produtos() {
                   <option value="Bebidas">Bebidas</option>
                   <option value="Sobremesas">Sobremesas</option>
                 </select>
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Imagem</label>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleImageChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Formatos aceitos: JPG, PNG, WebP. Máximo 5MB.
+                </p>
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center">

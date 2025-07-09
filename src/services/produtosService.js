@@ -13,18 +13,46 @@ export const produtosService = {
   },
 
   // Criar novo produto
-  async createProduto(produtoData) {
+  async createProduto(produtoData, imagem = null) {
+    const formData = new FormData()
+    
+    // Adicionar campos do produto
+    Object.keys(produtoData).forEach(key => {
+      if (produtoData[key] !== null && produtoData[key] !== undefined) {
+        formData.append(key, produtoData[key])
+      }
+    })
+    
+    // Adicionar imagem se fornecida
+    if (imagem) {
+      formData.append('imagem', imagem)
+    }
+    
     return await apiRequest('/produtos', {
       method: 'POST',
-      body: JSON.stringify(produtoData)
+      body: formData
     })
   },
 
   // Atualizar produto
-  async updateProduto(id, produtoData) {
+  async updateProduto(id, produtoData, imagem = null) {
+    const formData = new FormData()
+    
+    // Adicionar campos do produto
+    Object.keys(produtoData).forEach(key => {
+      if (produtoData[key] !== null && produtoData[key] !== undefined) {
+        formData.append(key, produtoData[key])
+      }
+    })
+    
+    // Adicionar imagem se fornecida
+    if (imagem) {
+      formData.append('imagem', imagem)
+    }
+    
     return await apiRequest(`/produtos/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(produtoData)
+      body: formData
     })
   },
 

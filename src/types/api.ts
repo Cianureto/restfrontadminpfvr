@@ -85,7 +85,7 @@ export interface Produto {
   descricao: string
   categoria: string
   preco: number
-  imagem: string | null
+  imagem: string | null // URL relativa da imagem
   disponivel: boolean
   criado_em: string
 }
@@ -95,7 +95,6 @@ export interface CreateProdutoRequest {
   descricao: string
   categoria: string
   preco: number
-  imagem?: string
   disponivel?: boolean
 }
 
@@ -104,7 +103,6 @@ export interface UpdateProdutoRequest {
   descricao?: string
   categoria?: string
   preco?: number
-  imagem?: string
   disponivel?: boolean
 }
 

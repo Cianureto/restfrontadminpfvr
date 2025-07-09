@@ -3,6 +3,9 @@ export const API_CONFIG = {
   // URL base da API
   BASE_URL: 'http://localhost:3000/api',
   
+  // URL base para imagens (sem /api)
+  BASE_URL_IMAGES: 'http://localhost:3000',
+  
   // Timeout das requisições (em ms)
   TIMEOUT: 10000,
   

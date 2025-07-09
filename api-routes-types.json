@@ -159,13 +159,14 @@
       },
       "POST /api/produtos": {
         "description": "Criar novo produto",
+        "contentType": "multipart/form-data",
         "body": {
           "nome": "string (required)",
           "descricao": "string (required)",
           "categoria": "string (required)",
           "preco": "number (required)",
-          "imagem": "string (optional)",
-          "disponivel": "boolean (optional, default: true)"
+          "disponivel": "boolean (optional, default: true)",
+          "imagem": "file (optional, max: 5MB, types: jpg/jpeg/png/webp)"
         },
         "response": {
           "success": "boolean",
@@ -175,7 +176,7 @@
             "descricao": "string",
             "categoria": "string",
             "preco": "number",
-            "imagem": "string|null",
+            "imagem": "string|null (URL relativa)",
             "disponivel": "boolean",
             "criado_em": "string (ISO)"
           }
@@ -183,6 +184,7 @@
       },
       "PUT /api/produtos/:id": {
         "description": "Atualizar produto",
+        "contentType": "multipart/form-data",
         "params": {
           "id": "string"
         },
@@ -191,8 +193,8 @@
           "descricao": "string (optional)",
           "categoria": "string (optional)",
           "preco": "number (optional)",
-          "imagem": "string (optional)",
-          "disponivel": "boolean (optional)"
+          "disponivel": "boolean (optional)",
+          "imagem": "file (optional, max: 5MB, types: jpg/jpeg/png/webp)"
         },
         "response": {
           "success": "boolean",
@@ -202,7 +204,7 @@
             "descricao": "string",
             "categoria": "string",
             "preco": "number",
-            "imagem": "string|null",
+            "imagem": "string|null (URL relativa)",
             "disponivel": "boolean",
             "criado_em": "string (ISO)"
           },
